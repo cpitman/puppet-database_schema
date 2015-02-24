@@ -1,14 +1,14 @@
 database_schema
 ===============
 
-This module manages the process of applying dtaabase schema migration scripts 
+This module manages the process of applying database schema migration scripts 
 as part of a puppet manifest. The actual migration process is dispatched to a 
 database migration tool.
 
 The tools currently supported are:
 
-* Flybase
-* Liquibase 
+* [Flybase](http://flywaydb.org/)
+* [Liquibase](http://www.liquibase.org/index.html) 
 
 This module can also manage the installation of supported tools.
 
