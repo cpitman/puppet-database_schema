@@ -1,0 +1,7 @@
+fixtures:
+  symlinks:
+    database_schema: "#{source_dir}"
+  forge_modules:
+    stdlib: "puppetlabs/stdlib"
+    archive: "camptocamp/archive"
+    
