@@ -22,6 +22,7 @@
        }
  ],
   "project_page": "https://github.com/cpitman/puppet-database_schema",
+  "issues_url": "https://github.com/cpitman/puppet-database_schema/issues",
   "requirements": [{"name": "pe", "version_requirement": "3.x"}],
   "source": "git@github.com:cpitman/puppet-database_schema",
   "summary": "Manages database schema configuration via standard schema migration tools.",
