@@ -4,7 +4,8 @@ include ::database_schema::liquibase
 include ::wget
 wget::fetch { 'MySql JDBC':
   destination =>'/opt/liquibase/lib/mysql.jar',
-  source      => 'http://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.34/mysql-connector-java-5.1.34.jar'
+  source      => 'http://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.34/mysql-connector-java-5.1.34.jar',
+  require     => Class['::database_schema::liquibase']
 }
 
 file { '/tmp/changelog.xml':
@@ -15,6 +16,7 @@ class { '::mysql::server':
   root_password => password,
   databases     => {
     'liquibasetestdb' => {
+      ensure => present
     }
   }
 }

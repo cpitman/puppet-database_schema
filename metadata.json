@@ -2,8 +2,8 @@
   "author": "Chris Pitman",
   "dependencies": [
   	{"name":"puppetlabs/stdlib","version_requirement":">= 3.2.0 < 5.0.0"},
-  	{"name":"camptocamp/archive","version_requirement":">=0.3.6 < 1.0.0"},
-  	{"name":"puppetlabs/java","version_requirement":">=1.0.0 < 2.0.0"}
+  	{"name":"camptocamp/archive","version_requirement":"0.x"},
+  	{"name":"puppetlabs/java","version_requirement":"1.x"}
   ],
   "license": "MIT",
   "name": "cpitman-database_schema",
@@ -26,5 +26,5 @@
   "source": "git@github.com:cpitman/puppet-database_schema",
   "summary": "Manages database schema configuration via standard schema migration tools.",
   "tags": ["database", "mysql", "postgres", "postgresql", "pgsql", "mysql", "mariadb"],
-  "version": "0.1.0"
+  "version": "1.0.0"
 }
