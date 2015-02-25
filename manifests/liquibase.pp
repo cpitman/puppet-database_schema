@@ -1,8 +1,30 @@
+# == Class database_schema::liquibase
+#
+# Ensures liquibase is installed from maven or a custom source. No jdbc drivers
+# are installed as part of this resource. All required jars must be placed in 
+# the lib folder of this installation before ensuring migrations.
+# 
+# === Parameters
+#
+# [*ensure*]
+#  present or absent
+# [*version*]
+#  The version of liquibase to install. Must be a version available on maven 
+#  central if not installing from source. Defaults to "3.3.2".
+# [*source*]
+#  Path to a tar.gz archive to install if not installing from maven central.
+# [*target_dir*]
+#  Directory to install liquibase in. Defaults to "/opt".
+# [*manage_java*]
+#  If true, ensure java is installed before flyway migrations are ensured.
+#  Defaults to true.
+#
 class database_schema::liquibase (
-  $ensure     = present,
-  $version    = '3.3.2',
-  $source     = undef,
-  $target_dir = '/opt'
+  $ensure      = present,
+  $version     = '3.3.2',
+  $source      = undef,
+  $target_dir  = '/opt',
+  $manage_java = true
 ) {
   $real_source = $source ? {
     undef   => "http://repo1.maven.org/maven2/org/liquibase/liquibase-core/${version}/liquibase-core-${version}-bin.tar.gz",
@@ -14,7 +36,7 @@ class database_schema::liquibase (
     default => directory
   }
   
-  if $ensure == present {
+  if $ensure == present and $manage_java {
     include ::java
     Class['::java'] -> Database_schema::Liquibase_migration<||>
   }

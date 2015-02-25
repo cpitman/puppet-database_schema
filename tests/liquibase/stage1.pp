@@ -14,8 +14,7 @@ file { '/tmp/changelog.xml':
 class { '::mysql::server':
   root_password => password,
   databases     => {
-    'liquibasetestdb'    => {
-      ensure    => present
+    'liquibasetestdb' => {
     }
   }
 }

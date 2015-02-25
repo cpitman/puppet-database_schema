@@ -4,8 +4,7 @@ include ::database_schema::flyway
 class { '::mysql::server':
   root_password => password,
   databases     => {
-    'testdb'    => {
-      ensure    => present
+    'testdb' => {
     }
   }
 }
