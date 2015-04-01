@@ -37,7 +37,18 @@ applied to a MySql database.
       jdbc_url      => 'jdbc:mysql://localhost/testdb',
       schema_source => '/vagrant/tests/data/stage1'
     }
+
+The following example will only migrate up to version 1.2
     
+    include ::database_schema::flyway
+
+    database_schema::flyway_migration { 'Migrate TestDB':
+      db_username   => root,
+      db_password   => password,
+      jdbc_url      => 'jdbc:mysql://localhost/testdb',
+      schema_source => '/vagrant/tests/data/stage1',
+      ensure        => '1.2'
+    }
 Limitations
 -----------
 

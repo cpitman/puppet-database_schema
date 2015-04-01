@@ -18,7 +18,7 @@
 # [*target_schemas*]
 #  Schemas to apply migrations to, provided as a list of schema names.
 # [*ensure*]
-#  Only supported value is "latest".
+#  Version number to migrate up to (see the migrate option "target" in the flyway docs). Defaults to "latest"
 #
 define database_schema::flyway_migration (
   $schema_source,
@@ -29,7 +29,7 @@ define database_schema::flyway_migration (
   $target_schemas      = undef,
   $ensure              = latest
 ){
-  $title_hash   = sha1(title)
+  $title_hash   = sha1($title)
   $staging_path = "/tmp/flyway-migration-${title_hash}"
   file { $staging_path:
     ensure  => directory,
@@ -37,7 +37,8 @@ define database_schema::flyway_migration (
     source  => $schema_source
   }
   
-  $flyway_base_command = "flyway -user='${db_username}' -password='${db_password}' -url='${jdbc_url}' -locations='filesystem:${staging_path}'"
+  $target_version = $ensure ? {latest => '', default => " -target=${ensure}"}
+  $flyway_base_command = "flyway -user='${db_username}' -password='${db_password}' -url='${jdbc_url}' -locations='filesystem:${staging_path}'$target_version"
   
   if $target_schemas == undef {
     $flyway_command = $flyway_base_command
