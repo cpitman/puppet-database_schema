@@ -29,7 +29,7 @@ define database_schema::flyway_migration (
   $target_schemas      = undef,
   $ensure              = latest
 ){
-  $title_hash   = sha1(title)
+  $title_hash   = sha1($title)
   $staging_path = "/tmp/flyway-migration-${title_hash}"
   file { $staging_path:
     ensure  => directory,
