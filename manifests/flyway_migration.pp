@@ -18,7 +18,7 @@
 # [*target_schemas*]
 #  Schemas to apply migrations to, provided as a list of schema names.
 # [*ensure*]
-#  Only supported value is "latest".
+#  Version number to migrate up to (see the migrate option "target" in the flyway docs). Defaults to "latest"
 #
 define database_schema::flyway_migration (
   $schema_source,
