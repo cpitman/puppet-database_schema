@@ -37,7 +37,8 @@ define database_schema::flyway_migration (
     source  => $schema_source
   }
   
-  $flyway_base_command = "flyway -user='${db_username}' -password='${db_password}' -url='${jdbc_url}' -locations='filesystem:${staging_path}'"
+  $target_version = $ensure ? {latest => '', default => " -target=${ensure}"}
+  $flyway_base_command = "flyway -user='${db_username}' -password='${db_password}' -url='${jdbc_url}' -locations='filesystem:${staging_path}'$target_version"
   
   if $target_schemas == undef {
     $flyway_command = $flyway_base_command
