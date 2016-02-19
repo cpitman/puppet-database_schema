@@ -1,2 +1,4 @@
 .vagrant
 .project
+spec/fixtures
+Gemfile.lock
