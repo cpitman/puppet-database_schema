@@ -19,6 +19,8 @@
 #  Schemas to apply migrations to, provided as a list of schema names.
 # [*ensure*]
 #  Version number to migrate up to (see the migrate option "target" in the flyway docs). Defaults to "latest"
+# [*placeholders*]
+#  A hash containing placeholders you want flyway to use. Each key expands to a "-placeholder.KEY='VALUE'" argument to flyway.
 #
 define database_schema::flyway_migration (
   $schema_source,
@@ -27,7 +29,8 @@ define database_schema::flyway_migration (
   $jdbc_url,
   $flyway_path         = '/opt/flyway-3.1',
   $target_schemas      = undef,
-  $ensure              = latest
+  $ensure              = latest,
+  $placeholders        = {},
 ){
   $title_hash   = sha1($title)
   $staging_path = "/tmp/flyway-migration-${title_hash}"
@@ -37,8 +40,11 @@ define database_schema::flyway_migration (
     source  => $schema_source
   }
   
+  validate_hash($placeholders)
+  $placeholders_str = flyway_cmd_placeholders($placeholders)
+
   $target_version = $ensure ? {latest => '', default => " -target=${ensure}"}
-  $flyway_base_command = "flyway -user='${db_username}' -password='${db_password}' -url='${jdbc_url}' -locations='filesystem:${staging_path}'$target_version"
+  $flyway_base_command = "flyway -user='${db_username}' -password='${db_password}' -url='${jdbc_url}' ${placeholders_str} -locations='filesystem:${staging_path}'$target_version"
   
   if $target_schemas == undef {
     $flyway_command = $flyway_base_command
