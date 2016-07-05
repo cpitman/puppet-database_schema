@@ -30,29 +30,44 @@ class database_schema::liquibase (
     undef   => "http://repo1.maven.org/maven2/org/liquibase/liquibase-core/${version}/liquibase-core-${version}-bin.tar.gz",
     default => $source
   }
-  
+
   $dir_ensure = $ensure ? {
     absent  => absent,
     default => directory
   }
-  
+
   if $ensure == present and $manage_java {
     include ::java
     Class['::java'] -> Database_schema::Liquibase_migration<||>
   }
-  
+
   file { "${target_dir}/liquibase":
     ensure => $dir_ensure,
-    force  => true
+    force  => true,
   }
-  
-  archive { "liquibase-core-${version}-bin":
-    ensure   => $ensure,
-    url      => $real_source,
-    target   => "${target_dir}/liquibase",
-    root_dir => 'liquibase',
-    checksum => false
+
+  $archive_metadata = load_module_metadata('archive')
+
+  if $archive_metadata['name'] == 'camptocamp-archive' {
+    archive { "liquibase-core-${version}-bin":
+      ensure   => $ensure,
+      url      => $real_source,
+      target   => "${target_dir}/liquibase",
+      root_dir => 'liquibase',
+      checksum => false,
+    }
+  } elsif $archive_metadata['name'] == 'puppet-archive' {
+    archive { "/tmp/liquibase-core-${version}-bin.tar.gz":
+      ensure       => $ensure,
+      extract      => true,
+      extract_path => "${target_dir}/liquibase",
+      source       => $real_source,
+      creates      => "${target_dir}/liquibase/liquibase.jar",
+      cleanup      => true,
+    }
+  } else {
+    fail("database_schema depends on puppet-archive or camptocamp-archive")
   }
-  
+
   Class['database_schema::liquibase'] -> Database_schema::Liquibase_migration<||>
 }

@@ -34,14 +34,35 @@ class database_schema::flyway (
     include ::java
     Class['::java'] -> Database_schema::Flyway_migration<||>
   }
-  
-  archive { "flyway-commandline-${version}":
-    ensure   => $ensure,
-    url      => $real_source,
-    target   => $target_dir,
-    root_dir => "flyway-${version}",
-    checksum => false
+
+  $archive_metadata = load_module_metadata('archive')
+
+  if $archive_metadata['name'] == 'camptocamp-archive' {
+    archive { "flyway-commandline-${version}":
+      ensure   => $ensure,
+      url      => $real_source,
+      target   => $target_dir,
+      root_dir => "flyway-${version}",
+      checksum => false,
+    }
+  } elsif $archive_metadata['name'] == 'puppet-archive' {
+    if $ensure == 'absent' {
+      file { "${target_dir}/flyway-${version}":
+        ensure => 'absent',
+        force  => true,
+      }
+    }
+    archive { "/tmp/flyway-commandline-${version}.tar.gz":
+      ensure       => $ensure,
+      extract      => true,
+      extract_path => $target_dir,
+      source       => $real_source,
+      creates      => "${target_dir}/flyway-${version}",
+      cleanup      => true,
+    }
+  } else {
+    fail("database_schema depends on puppet-archive or camptocamp-archive")
   }
-  
+
   Class['database_schema::flyway'] -> Database_schema::Flyway_migration<||>
 }
