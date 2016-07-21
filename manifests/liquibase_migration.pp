@@ -40,16 +40,16 @@ define database_schema::liquibase_migration (
     ensure => present,
     source => $changelog_source
   }
-  
+
   $liquibase_base_command = "liquibase --username='${db_username}' --password='${db_password}' --url='${jdbc_url}' --changeLogFile='${changelog_path}'"
-  
+
   if $default_schema == undef {
     $flyway_command = $liquibase_base_command
   }
   else {
     $flyway_command = "${liquibase_base_command} --defaultSchemaNAme='${default_schema}'"
   }
-  
+
   exec { "Migration for ${title}":
     cwd     => $liquibase_path,
     path    => "${liquibase_path}:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin",
