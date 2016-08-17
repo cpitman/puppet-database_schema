@@ -21,6 +21,10 @@
 #  Version number to migrate up to (see the migrate option "target" in the flyway docs). Defaults to "latest"
 # [*placeholders*]
 #  A hash containing placeholders you want flyway to use. Each key expands to a "-placeholder.KEY='VALUE'" argument to flyway.
+# [*baseline_on_migrate*]
+#  Whether to automatically call baseline when migrate is executed against a non-empty schema with no metadata table (see baselineOnMigrate flyway docs).
+#  Defaults to 'undef'.  When 'undef' the -baselineOnMigrate command option is not passed to flyway and flyway will use its own default or the value in its configuration file (if present).
+#  Set to `true` or `false` to explicitly override the setting for this migration.
 #
 define database_schema::flyway_migration (
   $schema_source,
@@ -31,6 +35,7 @@ define database_schema::flyway_migration (
   $target_schemas      = undef,
   $ensure              = latest,
   $placeholders        = {},
+  $baseline_on_migrate = undef,
 ){
   $title_hash   = sha1($title)
   $staging_path = "/tmp/flyway-migration-${title_hash}"
@@ -39,13 +44,20 @@ define database_schema::flyway_migration (
     recurse => true,
     source  => $schema_source
   }
-  
+
   validate_hash($placeholders)
   $placeholders_str = flyway_cmd_placeholders($placeholders)
 
+  if $baseline_on_migrate == undef {
+    $baseline_on_migrate_str = undef
+  } else {
+    validate_bool($baseline_on_migrate)
+    $baseline_on_migrate_str = " -baselineOnMigrate=${baseline_on_migrate}"
+  }
+
   $target_version = $ensure ? {latest => '', default => " -target=${ensure}"}
-  $flyway_base_command = "flyway -user='${db_username}' -password='${db_password}' -url='${jdbc_url}' ${placeholders_str} -locations='filesystem:${staging_path}'$target_version"
-  
+  $flyway_base_command = "flyway -user='${db_username}' -password='${db_password}' -url='${jdbc_url}' ${placeholders_str} -locations='filesystem:${staging_path}'${target_version}${baseline_on_migrate_str}"
+
   if $target_schemas == undef {
     $flyway_command = $flyway_base_command
   }
@@ -53,7 +65,7 @@ define database_schema::flyway_migration (
     $joined_schemas = join($target_schemas, ',')
     $flyway_command = "${flyway_base_command} -schemas='${joined_schemas}'"
   }
-  
+
   exec { "Migration for ${title}":
     cwd     => $flyway_path,
     path    => "${flyway_path}:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin",
