@@ -34,7 +34,7 @@ class database_schema::flyway (
     include ::java
     Class['::java'] -> Database_schema::Flyway_migration<||>
   }
-  
+
   archive { "flyway-commandline-${version}":
     ensure   => $ensure,
     url      => $real_source,
@@ -42,6 +42,6 @@ class database_schema::flyway (
     root_dir => "flyway-${version}",
     checksum => false
   }
-  
+
   Class['database_schema::flyway'] -> Database_schema::Flyway_migration<||>
 }
